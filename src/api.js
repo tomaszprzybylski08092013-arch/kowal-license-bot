@@ -1,0 +1,50 @@
+const baseUrl = process.env.LICENSE_API_BASE_URL;
+const adminApiKey = process.env.LICENSE_ADMIN_API_KEY;
+
+async function request(path, options = {}) {
+  const response = await fetch(`${baseUrl}${path}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      "x-admin-key": adminApiKey,
+      ...(options.headers || {})
+    }
+  });
+
+  return response.json();
+}
+
+export async function createDaysLicense(days, note) {
+  return request("/license/create", {
+    method: "POST",
+    body: JSON.stringify({
+      durationType: "days",
+      durationValue: days,
+      note
+    })
+  });
+}
+
+export async function createLifetimeLicense(note) {
+  return request("/license/create", {
+    method: "POST",
+    body: JSON.stringify({
+      durationType: "lifetime",
+      note
+    })
+  });
+}
+
+export async function revokeLicense(licenseKey) {
+  return request("/license/revoke", {
+    method: "POST",
+    body: JSON.stringify({ licenseKey })
+  });
+}
+
+export async function getLicenseInfo(licenseKey) {
+  return request(`/license/${encodeURIComponent(licenseKey)}`, {
+    method: "GET"
+  });
+}
+
