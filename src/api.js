@@ -11,7 +11,23 @@ async function request(path, options = {}) {
     }
   });
 
-  return response.json();
+  const contentType = response.headers.get("content-type") ?? "";
+  const rawBody = await response.text();
+
+  if (!contentType.includes("application/json")) {
+    const preview = rawBody.replace(/\s+/g, " ").slice(0, 120);
+    throw new Error(`Backend zwrocil nieprawidlowy format odpowiedzi (${response.status}). ${preview}`);
+  }
+
+  const json = JSON.parse(rawBody);
+  if (!response.ok) {
+    return {
+      success: false,
+      message: json.message ?? `Backend error ${response.status}.`
+    };
+  }
+
+  return json;
 }
 
 export async function createDaysLicense(days, minecraftNick, note) {
