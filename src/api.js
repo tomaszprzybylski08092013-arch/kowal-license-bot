@@ -14,10 +14,11 @@ async function request(path, options = {}) {
   return response.json();
 }
 
-export async function createDaysLicense(days, note) {
+export async function createDaysLicense(days, minecraftNick, note) {
   return request("/license/create", {
     method: "POST",
     body: JSON.stringify({
+      minecraftNick,
       durationType: "days",
       durationValue: days,
       note
@@ -25,10 +26,11 @@ export async function createDaysLicense(days, note) {
   });
 }
 
-export async function createLifetimeLicense(note) {
+export async function createLifetimeLicense(minecraftNick, note) {
   return request("/license/create", {
     method: "POST",
     body: JSON.stringify({
+      minecraftNick,
       durationType: "lifetime",
       note
     })
@@ -48,3 +50,19 @@ export async function getLicenseInfo(licenseKey) {
   });
 }
 
+export async function getLicenseInfoByNick(minecraftNick) {
+  return request(`/license-by-nick/${encodeURIComponent(minecraftNick)}`, {
+    method: "GET"
+  });
+}
+
+export async function listLicenses(status, page) {
+  const query = new URLSearchParams({
+    status,
+    page: String(page)
+  });
+
+  return request(`/licenses?${query.toString()}`, {
+    method: "GET"
+  });
+}
