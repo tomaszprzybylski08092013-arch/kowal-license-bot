@@ -16,6 +16,29 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds]
 });
 
+const dateTimeFormatter = new Intl.DateTimeFormat("pl-PL", {
+  timeZone: "Europe/Warsaw",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit"
+});
+
+function formatDateTime(value) {
+  if (!value) {
+    return "brak";
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return dateTimeFormatter.format(date);
+}
+
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}`);
 });
@@ -75,8 +98,8 @@ client.on("interactionCreate", async interaction => {
         `Status: ${license.status}`,
         `Typ: ${license.durationType}`,
         `Dni: ${license.durationValue ?? "lifetime"}`,
-        `Aktywowana: ${license.activatedAt ?? "jeszcze nie"}`,
-        `Wygasa: ${license.expiresAt ?? "lifetime"}`,
+        `Aktywowana: ${license.activatedAt ? formatDateTime(license.activatedAt) : "jeszcze nie"}`,
+        `Wygasa: ${license.expiresAt ? formatDateTime(license.expiresAt) : "lifetime"}`,
         `Install ID: ${license.boundInstallId ?? "brak"}`
       ].join("\n"));
       return;
